@@ -5,7 +5,7 @@ verify one before starting the next. Requirement references point to
 `requirements.md`. Do not execute these tasks yet — implementation happens
 in a separate pass after this spec is approved.
 
-- [ ] 1. Initialize Next.js App Router project
+- [x] 1. Initialize Next.js App Router project
   - Verify the local Node.js version meets `>= 20.9` (prefer Node 22 LTS)
     via `node --version` before scaffolding.
   - Initialize with `create-next-app` (TypeScript, ESLint, Tailwind, App
@@ -35,7 +35,7 @@ in a separate pass after this spec is approved.
     `node_modules/`/`.next/` untracked after install + build.
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 2.1, 2.2, 2.3_
 
-- [ ] 2. Configure Tailwind CSS v4 with design tokens
+- [x] 2. Configure Tailwind CSS v4 with design tokens
   - Install `tailwindcss` + `@tailwindcss/postcss`, wire into
     `app/globals.css` via `@import "tailwindcss"`.
   - Add the `@theme` block exactly as specified in `design.md` §4: colour,
@@ -57,7 +57,7 @@ in a separate pass after this spec is approved.
     `npm run lint` and `next build` still pass.
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.7, 5.6_
 
-- [ ] 3. Set up fonts via `next/font`
+- [x] 3. Set up fonts via `next/font`
   - Load Space Grotesk and Inter as variable fonts via `next/font/google`,
     each with an explicit `variable` (`--font-space-grotesk`,
     `--font-inter`) and `display: "swap"`, per `design.md` §10. Apply both
@@ -72,7 +72,7 @@ in a separate pass after this spec is approved.
     FOUC/layout shift on reload; only used weight ranges are fetched.
   - _Requirements: 5.1, 8.4, 14.2_
 
-- [ ] 4. Build typography primitives (`Display`, `Heading`, `Body`, `Label`)
+- [x] 4. Build typography primitives (`Display`, `Heading`, `Body`, `Label`)
   - Implement the corrected `clamp()` type scale map (Display XL =
     `clamp(3.5rem, 2.1rem + 6vw, 7.5rem)`) and the four Server Components
     per `design.md` §5. Each primitive applies its approved leading +
@@ -91,7 +91,7 @@ in a separate pass after this spec is approved.
     levels are controllable per usage site.
   - _Requirements: 5.2, 5.3, 5.4, 5.6_
 
-- [ ] 5. Build layout primitives (`Container`, `Grid`)
+- [x] 5. Build layout primitives (`Container`, `Grid`)
   - Implement the responsive grid at the explicit breakpoints from
     `design.md` §4 (base 4 cols; `md:` 8 cols; `lg:` 12 cols) and the
     content-box `Container`
@@ -104,7 +104,7 @@ in a separate pass after this spec is approved.
     outside it; grid usable by placing test children with `col-span-*`.
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 7.1_
 
-- [ ] 6. Write global styles (`app/globals.css`)
+- [x] 6. Write global styles (`app/globals.css`)
   - Add base element resets, body background/ink colour, font smoothing,
     the `:root` `--duration-*` block (§4), a shared `:focus-visible` style,
     and the concrete `prefers-reduced-motion` block specified in
@@ -115,7 +115,7 @@ in a separate pass after this spec is approved.
     transitions.
   - _Requirements: 8.1, 8.2, 8.3, 12.3, 12.6_
 
-- [ ] 7. Build `Header`, `HeaderShell`, and `DesktopNav`
+- [x] 7. Build `Header`, `HeaderShell`, and `DesktopNav`
   - Implement the corrected boundary from `design.md` §7: `Header`
     (Server Component) renders `<header>`/`<nav aria-label="Primary">` with
     server-rendered `DesktopNav`, and passes that markup as `children` into
@@ -130,7 +130,7 @@ in a separate pass after this spec is approved.
     increase for static routes beyond those islands.
   - _Requirements: 11.1, 11.2, 11.6, 11.7, 12.4_
 
-- [ ] 8. Build `MobileNav` full-screen overlay
+- [x] 8. Build `MobileNav` full-screen overlay
   - Implement hamburger trigger (Lucide icons), full-screen dialog overlay,
     focus trap, `Escape`-to-close, focus return to trigger, body scroll
     lock while open.
@@ -140,14 +140,14 @@ in a separate pass after this spec is approved.
     open/close transition.
   - _Requirements: 11.3, 11.4, 11.5, 12.6_
 
-- [ ] 9. Build `Footer`
+- [x] 9. Build `Footer`
   - Minimal Server Component with route links and a copyright line only
     (no fabricated contact/social content).
   - Verify: all footer links resolve to real routes; renders correctly at
     all breakpoints.
   - _Requirements: 10.1, 10.4_
 
-- [ ] 10. Assemble root layout (`app/layout.tsx`)
+- [x] 10. Assemble root layout (`app/layout.tsx`)
   - Compose skip link → `Header` → `<main id="main" tabIndex={-1}>` →
     `Footer`; set `<html lang="en">` with both next/font `.variable`
     classes applied; import `globals.css`.
@@ -158,7 +158,7 @@ in a separate pass after this spec is approved.
     accessibility tree.
   - _Requirements: 9.4, 12.1, 12.2_
 
-- [ ] 11. Add shared SEO metadata utilities
+- [x] 11. Add shared SEO metadata utilities
   - Implement `lib/metadata/site.ts` and `lib/metadata/createMetadata.ts`.
   - Verify: calling `createMetadata({ title, description, path })` in a
     scratch/test route produces a `Metadata` object with `title`,
@@ -166,7 +166,7 @@ in a separate pass after this spec is approved.
     fields populated correctly.
   - _Requirements: 13.1, 13.2, 13.5_
 
-- [ ] 12. Create placeholder routes: `/`, `/work`, `/think`, `/build`, `/about`
+- [x] 12. Create placeholder routes: `/`, `/work`, `/think`, `/build`, `/about`
   - Minimal `page.tsx` per route with one `Heading`/`Body` pair of clearly
     provisional copy; each exports `metadata` via the shared helper built
     in Task 11.
@@ -175,7 +175,7 @@ in a separate pass after this spec is approved.
     per-route `<title>`/meta description/canonical differ across routes.
   - _Requirements: 9.1, 5.5, 13.1, 13.2_
 
-- [ ] 13. Set up MDX pipeline and content model
+- [x] 13. Set up MDX pipeline and content model
   - Configure `@next/mdx` with `@mdx-js/loader` in `next.config.ts`;
     install `@mdx-js/react` and `@types/mdx`.
   - Add root-level `mdx-components.tsx` exporting `useMDXComponents` with
@@ -201,7 +201,7 @@ in a separate pass after this spec is approved.
     `###` → level 3), not all level 2.
   - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5, 15.7_
 
-- [ ] 14. Build `/work/[slug]` dynamic route
+- [x] 14. Build `/work/[slug]` dynamic route
   - Implement `generateStaticParams` (sourced from
     `getAllCaseStudySlugs()`), render the MDX body for known slugs via
     `getCaseStudyBySlug`, call `notFound()` for unknown slugs.
@@ -211,7 +211,7 @@ in a separate pass after this spec is approved.
     nonexistent slug returns a real 404 page, not a crash.
   - _Requirements: 9.2, 15.6_
 
-- [ ] 15. Add `sitemap.ts` and `robots.ts`
+- [x] 15. Add `sitemap.ts` and `robots.ts`
   - Implement Next.js metadata-file conventions listing only routes that
     exist this milestone (including the resolved `/work/_example` entry).
   - Verify: `/sitemap.xml` and `/robots.txt` resolve and list the correct
@@ -219,7 +219,7 @@ in a separate pass after this spec is approved.
     beyond the example).
   - _Requirements: 13.3_
 
-- [ ] 16. Full verification pass
+- [x] 16. Full verification pass
   - Run `node --version` (confirm `>= 20.9`), `tsc --noEmit`,
     `npm run lint`, `next build` — in that order, all must pass cleanly.
   - Run the full verification plan in `design.md` §13, including the

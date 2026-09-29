@@ -1,1 +1,207 @@
 @import "tailwindcss";
+
+@theme {
+  /* Colour */
+  --color-canvas: #F5F5F2;
+  --color-surface: #FFFFFF;
+  --color-ink: #111111;
+  --color-muted: #6B6B68;
+  --color-border: #D9D9D4;
+  --color-accent: #3155FF;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* Motion — easing only. Durations are declared in :root below, not here,
+     because Tailwind v4 has no --duration-* @theme namespace (§4). */
+  --ease-standard: ease-out;
+
+  /* Fonts — reference next/font CSS variables (wired in Task 3), not literal
+     family names. */
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Make Inter (via the body token) the document default so `body` inherits
+     the next/font family instead of Tailwind v4 preflight's OS stack. This
+     maps Tailwind's default-font namespace to our token; base element resets
+     (colour, smoothing) still belong to Task 6. */
+  --default-font-family: var(--font-body);
+
+  /* Line height (leading) — approved tokens. --leading-* is a valid Tailwind
+     v4 namespace (produces leading-display, leading-heading, leading-body,
+     leading-caption utilities). */
+  --leading-display: 0.95;
+  --leading-heading: 1.05;
+  --leading-body: 1.6;
+  --leading-caption: 1.5;
+
+  /* Letter spacing (tracking) — approved tokens. --tracking-* is a valid
+     Tailwind v4 namespace (produces tracking-display, tracking-heading,
+     tracking-body, tracking-caption utilities). */
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.015em;
+  --tracking-body: 0em;
+  --tracking-caption: 0em;
+
+  /* Breakpoints — explicit, named. mobile (base, <768px) = 4 cols;
+     tablet (md:, 768–1023px) = 8 cols; desktop (lg:, ≥1024px) = 12 cols.
+     Values are Tailwind's own md/lg defaults, made explicit (§4). */
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+}
+
+/* Motion timing tokens — plain custom properties (NOT @theme), consumed via
+   Tailwind v4's duration-(--duration-standard) syntax (§4). Cinematic is a
+   point value within the approved 1000–1400ms range. */
+:root {
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-standard: 400ms;
+  --duration-slow: 700ms;
+  --duration-cinematic: 1200ms;
+
+  /* Grid / Container — content-box reading (§4): 1440px is the width of the
+     content area itself; the page margin is additional gutter outside it, not
+     carved out of it. `Container` applies
+     max-width: calc(var(--grid-max-width) + 2 * var(--grid-margin)) with
+     padding-inline: var(--grid-margin), so inner content caps at a true
+     1440px with the margin as padding inside a wider outer box. Declared as
+     plain custom properties (not @theme) since they're consumed as raw CSS
+     values by Container, not as Tailwind utility tokens. */
+  --grid-max-width: 1440px;
+  --grid-margin: clamp(20px, 4vw, 64px);
+}
+
+/* Base element styles (Task 6, Req 8.1). Placed in @layer base so Tailwind
+   utilities still win the cascade and can override per-element. Tailwind v4
+   preflight already provides a modern reset (box-sizing, margin zeroing,
+   etc.) — we add only what's needed on top: document background/ink colour,
+   and font smoothing. The body font family is already inherited from the
+   --default-font-family token wired in the @theme block above (Task 2/3), so
+   it is not redeclared here. */
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* Shared focus indicator (Task 6, Req 8.3 / 12.3). A single global
+   :focus-visible rule using the Accent colour as an outline, applied once
+   rather than per-component so it can never be forgotten on a new
+   interactive element (design.md §12(A)). This is a visible, non-colour-only
+   indicator: a solid outline with width + offset (not merely a colour
+   change), meeting WCAG 2.2 AA. Not inside @layer base, so a component can
+   only override it deliberately, not by an incidental utility. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Reduced motion (Task 6, Req 8.2 / 12.6). Concrete short-duration override
+   per design.md §12(A) — deliberately NOT a blanket `transition: none`,
+   which would break interruptibility (Motion Principle 6) and later fight
+   Motion for React exit animations. Near-zero durations let transitions
+   effectively no-op while remaining interruptible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Header / navigation (Task 7, design.md §7; Req 11.1, 11.2, 11.6, 11.7, 12.4)
+
+   The header is a fixed, subtle bar that compacts on scroll. The client
+   `HeaderShell` sets `data-scrolled` on its wrapper (`.header-shell`); all
+   compaction/blur/border treatment is pure CSS keyed off that attribute, so
+   no JS drives the animation. Transitions animate only GPU-friendly
+   properties (padding via transform-free height, opacity, backdrop-filter) and
+   inherit the global `prefers-reduced-motion` short-duration override — no
+   per-rule reduced-motion block needed here.
+--------------------------------------------------------------------------- */
+
+.header-bar {
+  /* Backdrop blur + border fade in only once scrolled; base state is a
+     near-transparent bar that does not dominate content (Req 11.2). */
+  backdrop-filter: blur(0);
+  transition:
+    padding-block var(--duration-standard) var(--ease-standard),
+    background-color var(--duration-standard) var(--ease-standard),
+    border-color var(--duration-standard) var(--ease-standard),
+    backdrop-filter var(--duration-standard) var(--ease-standard);
+}
+
+/* Compacted state: reduced height, backdrop blur, subtle border, translucent
+   surface. Selector matches the boolean stringified by React (data-scrolled
+   is `"true"`/`"false"`). */
+.header-shell[data-scrolled="true"] .header-bar {
+  padding-block: 0.5rem;
+  background-color: color-mix(in srgb, var(--color-canvas) 80%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom-color: var(--color-border);
+}
+
+/* Active-route cue (Req 12.4): a non-colour underline driven off the same
+   `aria-current="page"` attribute that HeaderShell sets for assistive tech —
+   one source of truth for both the AT signal and the visual state. */
+.nav-link[aria-current="page"] {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile navigation overlay (Task 8, design.md §7; Req 11.3–11.5, 12.6)
+
+   MobileNav (client island) toggles `data-open` on the overlay. All open/close
+   visual state is pure CSS keyed off that attribute — no JS drives the motion.
+
+   Closed state: fully transparent, translated up slightly, and removed from
+   the tab order / hit-testing via visibility:hidden + pointer-events:none so
+   its links are not keyboard- or pointer-reachable while hidden. Open state:
+   opaque and in position. Only GPU-friendly properties (opacity, transform)
+   animate; visibility is stepped at the transition ends so it doesn't fade the
+   focus trap in/out. Transitions inherit the global prefers-reduced-motion
+   short-duration override above (Req 12.6) — no per-rule block needed.
+--------------------------------------------------------------------------- */
+
+.mobile-overlay {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition:
+    opacity var(--duration-standard) var(--ease-standard),
+    transform var(--duration-standard) var(--ease-standard),
+    visibility 0s linear var(--duration-standard);
+}
+
+.mobile-overlay[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition:
+    opacity var(--duration-standard) var(--ease-standard),
+    transform var(--duration-standard) var(--ease-standard),
+    visibility 0s linear 0s;
+}
+
+/* Body scroll lock while the overlay is open (Req 11.5). MobileNav toggles
+   this class on <body>. */
+body.overflow-hidden {
+  overflow: hidden;
+}
