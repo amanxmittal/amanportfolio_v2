@@ -20,6 +20,15 @@ type ProjectMetaProps = {
   headingId: string;
   /** The lead project gets a larger name treatment. */
   featured?: boolean;
+  /**
+   * Heading level for the project name. The same entry appears at two
+   * document depths — beneath the homepage's "Selected Work" h2 (so h3), and
+   * beneath the /work page's own h1 (so h2). Levels follow the document, not
+   * the visual size, so the hierarchy stays unbroken in both (CLAUDE.md §9).
+   * A level prop is configuration, but the alternative is duplicating the
+   * entry markup per route, which would be worse.
+   */
+  level?: 2 | 3;
 };
 
 function ProvisionalValue({ children }: { children: React.ReactNode }) {
@@ -31,12 +40,17 @@ function ProvisionalValue({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ProjectMeta({ project, headingId, featured = false }: ProjectMetaProps) {
+export function ProjectMeta({
+  project,
+  headingId,
+  featured = false,
+  level = 3,
+}: ProjectMetaProps) {
   const { name, role, discipline, valueProposition, provisional } = project;
 
   return (
     <div>
-      <Heading as="h3" size={featured ? "xl" : "l"} id={headingId}>
+      <Heading as={level === 2 ? "h2" : "h3"} size={featured ? "xl" : "l"} id={headingId}>
         {name}
       </Heading>
 

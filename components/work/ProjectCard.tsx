@@ -27,6 +27,8 @@ type ProjectCardProps = {
   project: ProjectSummary;
   index: number;
   featured?: boolean;
+  /** Heading level for the project name — see ProjectMeta. */
+  level?: 2 | 3;
 };
 
 /**
@@ -113,7 +115,12 @@ function CaseStudyAffordance({
   );
 }
 
-export function ProjectCard({ project, index, featured = false }: ProjectCardProps) {
+export function ProjectCard({
+  project,
+  index,
+  featured = false,
+  level = 3,
+}: ProjectCardProps) {
   const headingId = `project-${project.order}-name`;
   // Alternate the offset side for non-featured entries so the sequence reads
   // editorially rather than as a repeating template.
@@ -151,7 +158,12 @@ export function ProjectCard({ project, index, featured = false }: ProjectCardPro
                 : "lg:col-start-1 lg:col-span-4 lg:row-start-1",
           )}
         >
-          <ProjectMeta project={project} headingId={headingId} featured={featured} />
+          <ProjectMeta
+            project={project}
+            headingId={headingId}
+            featured={featured}
+            level={level}
+          />
           <CaseStudyAffordance project={project} labelledBy={headingId} />
         </div>
       </Grid>

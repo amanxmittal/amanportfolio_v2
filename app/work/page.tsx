@@ -1,25 +1,32 @@
-import { Container } from "@/components/layout/Container";
-import { Heading } from "@/components/typography/Heading";
-import { Body } from "@/components/typography/Body";
+import { ProjectGrid } from "@/components/work/ProjectGrid";
 import { createMetadata } from "@/lib/metadata/createMetadata";
 
-// Provisional work index. Copy is placeholder scaffolding, not final approved
-// content from content.md; the real Selected Work index lands in a later
-// milestone (design.md §8). Renders only its content — the <main> landmark and
-// shared layout come from app/layout.tsx.
+/**
+ * Work index — Server Component.
+ *
+ * Renders the same typed `projects` model as the homepage's Selected Work
+ * section, through the same `ProjectGrid`, at `level={1}` so this page's
+ * heading is its `h1` and project names are `h2`. No separate copy, model or
+ * layout is introduced: the homepage section and this route are one component
+ * with one content source, so real project content (CR-1/CR-2) lands in both
+ * at once.
+ *
+ * Content state: entries are the approved project identities (blueprint §10)
+ * with provisional role/discipline/value-proposition placeholders. No intro
+ * or lede is written here, because none is approved (CLAUDE.md §17).
+ *
+ * The <main> landmark comes from the frozen root layout; this page renders
+ * only its content.
+ */
 export const metadata = createMetadata({
   title: "Work",
-  description: "Selected work index — provisional placeholder page.",
+  // Factual description of the page, built from the approved positioning
+  // vocabulary (product.md) rather than new marketing copy.
+  description:
+    "Selected work by Aman Mittal — products, systems and experiences designed at scale.",
   path: "/work",
 });
 
 export default function Work() {
-  return (
-    <Container>
-      <Heading as="h1" size="xl">
-        Work
-      </Heading>
-      <Body>Selected work will live here — index coming soon.</Body>
-    </Container>
-  );
+  return <ProjectGrid level={1} />;
 }

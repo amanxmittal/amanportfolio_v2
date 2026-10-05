@@ -14,8 +14,19 @@ import { Reveal } from "@/components/motion/Reveal";
  *
  * The lead project is `featured` and takes the full grid width; the rest
  * alternate in an offset composition handled by ProjectCard.
+ *
+ * Used in two document contexts: as a section of the homepage (heading h2,
+ * project names h3) and as the whole of `/work` (heading h1, names h2). The
+ * `level` prop shifts both, so one component owns the layout and the heading
+ * hierarchy stays correct on each route rather than the markup being
+ * duplicated per page.
  */
-export function ProjectGrid() {
+type ProjectGridProps = {
+  /** 2 = homepage section (default), 1 = the /work page's own heading. */
+  level?: 1 | 2;
+};
+
+export function ProjectGrid({ level = 2 }: ProjectGridProps = {}) {
   const projects = getProjectsInOrder();
 
   return (
@@ -31,7 +42,7 @@ export function ProjectGrid() {
           (CLAUDE.md §17).
         */}
         <div className="mb-16 lg:mb-24">
-          <Heading as="h2" size="xl" id="selected-work-heading">
+          <Heading as={level === 1 ? "h1" : "h2"} size="xl" id="selected-work-heading">
             Selected Work
           </Heading>
         </div>
@@ -46,6 +57,7 @@ export function ProjectGrid() {
                   project={project}
                   index={index}
                   featured={index === 0}
+                  level={level === 1 ? 2 : 3}
                 />
               </Reveal>
             </li>

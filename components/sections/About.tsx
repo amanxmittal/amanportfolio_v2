@@ -28,11 +28,22 @@ const ABOUT_ITEMS = [
   "Tools and areas of expertise",
 ] as const;
 
-export function About() {
+/**
+ * Used both as a homepage section (heading h2, sub-items h3) and as the whole
+ * of `/about` (heading h1, sub-items h2). `level` shifts both together so the
+ * approved positioning copy lives in one place and each route keeps a valid
+ * heading hierarchy.
+ */
+type AboutProps = {
+  /** 2 = homepage section (default), 1 = the /about page's own heading. */
+  level?: 1 | 2;
+};
+
+export function About({ level = 2 }: AboutProps = {}) {
   return (
     <section id="about" aria-labelledby="about-heading" className="py-24 lg:py-32">
       <Container>
-        <Heading as="h2" size="xl" id="about-heading">
+        <Heading as={level === 1 ? "h1" : "h2"} size="xl" id="about-heading">
           About
         </Heading>
 
@@ -49,7 +60,7 @@ export function About() {
               index={index}
               className="col-span-4 md:col-span-4 lg:col-span-6"
             >
-              <Heading as="h3" size="s">
+              <Heading as={level === 1 ? "h2" : "h3"} size="s">
                 {item}
               </Heading>
               <Body size="m" className="mt-4 max-w-prose text-muted italic">
