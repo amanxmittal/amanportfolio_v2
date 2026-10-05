@@ -16,6 +16,7 @@
     "@mdx-js/react": "3.1.1",
     "@next/mdx": "16.3.7",
     "lucide-react": "1.48.0",
+    "motion": "13.4.5",
     "next": "16.3.7",
     "react": "19.3.0",
     "react-dom": "19.3.0"

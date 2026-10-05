@@ -81,10 +81,15 @@ effects papering over weak structure).
 
 ## Agent hierarchy (for context, not enforcement)
 
-- ChatGPT: product/design direction
-- Aman (the user): final creative authority
-- Kiro: primary implementation and structured development
-- Claude Code: independent engineering review, debugging, targeted implementation
+- ChatGPT: product/design/architecture direction, specification reconciliation and decision support
+- Aman (the user): final creative, product and governance authority
+- Kiro: specification and task-definition agent
+- Claude Code: primary implementation agent for approved/frozen milestones
+- Claude Code (review mode): independent engineering reviewer, debugger and specialist implementation support when explicitly asked
+
+Claude Code operates in two modes — implementation (implements an approved/frozen
+specification) and review (independently audits existing implementation when
+explicitly asked).
 
 No agent may independently redefine the approved product direction.
 

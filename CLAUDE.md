@@ -459,27 +459,55 @@ final approved copy.
 
 ## 18. Working alongside Kiro
 
-Kiro is the primary implementation agent. Claude Code is the independent
-engineering reviewer, debugger and specialist implementer
-(`.kiro/steering/review-process.md`).
+Kiro is responsible for specification and task definition.
+Claude Code is the primary implementation agent for approved and frozen
+milestones.
 
-- **Do not modify `.kiro/steering/*` unless explicitly asked.** Propose
-  changes; let Aman decide.
-- **Do not modify `IMPLEMENTATION_BLUEPRINT.md` unless explicitly asked.**
-- **Do not modify `.kiro/specs/*` unless explicitly asked.** Reviewing a spec
-  means reporting findings, not editing it.
-- **Do not execute Kiro spec tasks unless explicitly asked.** A task list in
-  `tasks.md` is Kiro's queue, not an instruction to Claude.
-- When reviewing Kiro's work, be specific and evidence-based: cite the file
-  and line, state the concrete failure, and recommend a change. Do not
-  rewrite Kiro's approach because a different one is equally valid.
-- **Review against the approved Spec, not against your own preferences.** If
-  Kiro's output matches the Spec and you disagree with the Spec, the finding
-  is against the Spec — say so, and raise it with Aman.
-- When Kiro's plan is sound, say so. An independent review that only lists
-  problems is not independent.
-- Keep the repository in a state Kiro can resume from: no half-applied
-  refactors, no uncommitted structural changes left unexplained.
+Claude Code may also operate as an independent engineering reviewer,
+debugger and specialist implementation support when explicitly asked to
+review existing work.
+
+### Implementation mode
+
+- Kiro owns requirements, design specifications and task decomposition.
+- Claude Code implements the currently approved Kiro Spec.
+- Claude Code must read the relevant steering files and active Spec before
+  implementation.
+- Claude Code must implement tasks in dependency order and must not silently
+  expand milestone scope.
+- Claude Code must stop and report conflicts, missing decisions or missing
+  design-system tokens rather than resolving them silently.
+- Claude Code may make implementation decisions where the approved sources
+  are silent, provided the decision does not affect product direction.
+- Product, visual, content, interaction, animation, token, architecture or
+  scope decisions requiring approval must be raised before implementation.
+
+### Review mode
+
+When explicitly asked to review Kiro's implementation:
+
+- Review against the approved Spec and authoritative project sources, not
+  personal preferences.
+- Cite the relevant file and line or other concrete evidence.
+- Distinguish implementation bugs, Spec deviations, environment issues,
+  observations and open decisions.
+- Do not modify application code while performing an independent review
+  unless explicitly asked to remediate findings.
+- When the implementation is sound, say so.
+- Keep the repository in a state Kiro or Claude Code can resume from.
+
+### Governance
+
+- Do not modify `.kiro/steering/` unless explicitly asked.
+- Do not modify `IMPLEMENTATION_BLUEPRINT.md` unless explicitly asked.
+- Do not modify `.kiro/specs/` unless explicitly asked.
+- Do not modify this file unless explicitly asked.
+- Do not execute an unapproved Kiro Spec merely because its tasks exist.
+- An approved Spec is the implementation contract for its milestone.
+- Do not turn review recommendations into new requirements without approval.
+
+The independent live audit remains separate from implementation whenever an
+independent assessment is requested.
 
 ---
 

@@ -1028,18 +1028,24 @@ It must satisfy:
 
 ChatGPT:
 
-Product/design direction
+Product/design/architecture direction, specification reconciliation and decision support
 
 You:
 
-Final creative authority
+Final creative, product and governance authority
 
 Kiro:
 
-Primary implementation and structured development
+Specification and task-definition agent
 
 Claude Code:
 
-Independent engineering review, debugging and targeted implementation
+Primary implementation agent for approved/frozen milestones
+
+Claude Code (review mode):
+
+Independent engineering reviewer, debugger and specialist implementation support when explicitly asked
+
+Claude Code operates in two modes: implementation mode (implements an approved/frozen specification) and review mode (independently audits existing implementation when explicitly asked).
 
 No agent may independently redefine the approved product direction.

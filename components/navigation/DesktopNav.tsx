@@ -26,6 +26,12 @@ export function DesktopNav() {
           <Link
             href={item.href}
             data-nav={item.href}
+            // Provisional links (e.g. LET'S TALK → /about until Contact exists)
+            // are excluded from active-route matching so they never claim
+            // aria-current — otherwise /about would mark both ABOUT and LET'S
+            // TALK (M-03). The link target is unchanged, so it stays a real,
+            // non-dead link.
+            data-nav-provisional={item.provisional ? "" : undefined}
             aria-label={item.brand ? "Aman Mittal — home" : undefined}
             className={cn(
               // >= 44x44px touch target via padding + min-height; the nav-link
@@ -38,7 +44,7 @@ export function DesktopNav() {
           >
             <Label
               as="span"
-              className={cn(item.brand ? "font-display text-[0.95rem]" : "text-ink")}
+              className={cn(item.brand ? "font-display" : "text-ink")}
             >
               {item.label}
             </Label>

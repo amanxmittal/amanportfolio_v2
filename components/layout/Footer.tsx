@@ -44,7 +44,7 @@ export function Footer() {
                   "transition-[color] duration-(--duration-fast) hover:text-accent",
                 )}
               >
-                <Label as="span" className="font-display text-[0.95rem]">
+                <Label as="span" className="font-display">
                   AM
                 </Label>
               </Link>

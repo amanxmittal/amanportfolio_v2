@@ -43,12 +43,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
           The header is fixed (HeaderShell: `fixed inset-x-0 top-0`), so it is
           removed from normal flow and would otherwise overlap the top of the
-          content. A modest top padding offsets the header height. This is a
-          plain static layout offset — NOT the deferred SC 2.4.11
-          `scroll-padding-top` / `--header-height` mechanism (design.md §14
-          items 6–8), which is explicitly out of scope for this milestone.
+          content. The unscrolled header is its tallest state: py-4 (16px top +
+          16px bottom = 32px) around a 44px min-height control row ≈ 76px, so
+          the previous 64px (pt-16) offset left the first content sitting under
+          the header at the default scroll position (M-07). pt-20 (80px, an
+          approved 8-point-scale step) clears the base header at both 375px and
+          1440px. This is a plain static layout offset — NOT the deferred SC
+          2.4.11 `scroll-padding-top` / `--header-height` mechanism (design.md
+          §14 items 6–8), which remains out of scope for this milestone.
         */}
-        <main id="main" tabIndex={-1} className="pt-16">
+        <main id="main" tabIndex={-1} className="pt-20">
           {children}
         </main>
         <Footer />

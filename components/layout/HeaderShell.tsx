@@ -48,6 +48,17 @@ export function HeaderShell({ children }: HeaderShellProps) {
 
     const links = root.querySelectorAll<HTMLAnchorElement>("a[data-nav]");
     links.forEach((link) => {
+      // Provisional links (e.g. LET'S TALK, which points at /about until the
+      // Contact route exists) are stand-ins, not the real destination for
+      // their target route. Excluding them ensures exactly one nav item
+      // receives aria-current="page" for /about — the real ABOUT link — rather
+      // than both (M-03). The link's href is untouched, so it is not a dead
+      // link.
+      if (link.hasAttribute("data-nav-provisional")) {
+        link.removeAttribute("aria-current");
+        return;
+      }
+
       const target = link.getAttribute("data-nav") ?? "";
       // Active when the path equals the target ("/" home) or is nested within
       // a section ("/work/foo" activates "/work"). "/" only matches exactly so

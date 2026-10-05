@@ -17,17 +17,32 @@ the conflict rather than silently changing the direction.
 ## Agent roles
 
 ChatGPT:
-Product, UX, IA, visual and creative direction.
+Product, design and architecture direction and reconciliation.
 
 Aman:
-Final creative authority and approval.
+Final product, design and governance authority.
 
 Kiro:
-Primary implementation agent and structured development.
+Specification and task definition — owns requirements, design and task
+decomposition.
 
 Claude Code:
-Independent engineering reviewer, debugger and specialist implementation
-support.
+Primary implementation agent for approved milestones; independent
+engineering reviewer and debugger when explicitly operating in review mode.
+
+### Role split
+
+Claude Code has two modes, and keeping both is deliberate — the reviewer
+capability is preserved, not replaced:
+
+- **Kiro:** specification and task definition.
+- **Claude Code (implementation mode):** primary implementation of an
+  approved/frozen specification.
+- **Claude Code (review mode):** independent engineering reviewer and
+  debugger, entered only when specifically asked to audit Kiro's
+  implementation.
+- **Aman:** final product/design/governance authority.
+- **ChatGPT:** product/design/architecture direction and reconciliation.
 
 ## Implementation behaviour
 

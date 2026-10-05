@@ -1,10 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
 import { Label } from "@/components/typography/Label";
+import { typeScale } from "@/components/typography/scale";
 import { cn } from "@/lib/utils/cn";
 import { NAV_ITEMS } from "./navItems";
 
@@ -31,11 +40,29 @@ import { NAV_ITEMS } from "./navItems";
  * No animation library is used — a show/hide overlay only needs CSS, keeping
  * Motion for React reserved for the hero/signature transition later.
  */
+// Client-mount detector for the portal. `useSyncExternalStore` returns the
+// server snapshot (false) during SSR/hydration and the client snapshot (true)
+// in the browser, without calling setState inside an effect — hydration-safe
+// and lint-clean (react-hooks/set-state-in-effect).
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
   const triggerRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const firstItemRef = useRef<HTMLAnchorElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  // Tracks whether the overlay has actually been opened, so focus is only
+  // restored to the trigger after a genuine open→close transition — never on
+  // the initial mount (Req 11.4 / M-02).
+  const hasOpenedRef = useRef(false);
   const overlayId = useId();
 
   const close = useCallback(() => setOpen(false), []);
@@ -51,15 +78,18 @@ export function MobileNav() {
     };
   }, [open]);
 
-  // On open: move focus into the overlay (close button). On close: restore
-  // focus to the trigger (Req 11.4). The `open`-dependent effect runs after
-  // the overlay has mounted/painted, so the close button ref is populated.
+  // Focus management (Req 11.4 / M-02):
+  //  - On open: move focus to the first menu item and record that the overlay
+  //    has been opened at least once.
+  //  - On close: restore focus to the trigger ONLY after a real open→close
+  //    transition — guarded by `hasOpenedRef` so the initial mount (open ===
+  //    false) never steals focus from the skip link, which must remain the
+  //    first keyboard destination on page load.
   useEffect(() => {
     if (open) {
-      closeButtonRef.current?.focus();
-    } else {
-      // Only pull focus back to the trigger if focus is not already elsewhere
-      // due to a deliberate user action (e.g. clicking a link navigates away).
+      hasOpenedRef.current = true;
+      firstItemRef.current?.focus();
+    } else if (hasOpenedRef.current) {
       triggerRef.current?.focus();
     }
     // Refs are stable, so `open` is the only reactive dependency.
@@ -118,7 +148,7 @@ export function MobileNav() {
           "hover:text-accent",
         )}
       >
-        <Label as="span" className="font-display text-[0.95rem]">
+        <Label as="span" className="font-display">
           AM
         </Label>
       </Link>
@@ -140,57 +170,77 @@ export function MobileNav() {
         <Menu aria-hidden="true" size={24} strokeWidth={1.75} />
       </button>
 
-      <div
-        ref={overlayRef}
-        id={overlayId}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Menu"
-        data-open={open}
-        // Hidden from AT + tab order when closed via `inert`-like hiding: the
-        // visibility:hidden in the closed-state CSS removes it from the tab
-        // order, and pointer-events:none prevents interaction; keeping it in
-        // the DOM lets the CSS transition run on open/close.
-        className="mobile-overlay fixed inset-0 z-[60] bg-canvas"
-      >
-        <div className="flex items-center justify-between px-(--grid-margin) py-4">
-          <Label as="span" className="font-display text-[0.95rem] text-ink">
-            MENU
-          </Label>
-          <button
-            ref={closeButtonRef}
-            type="button"
-            onClick={close}
-            aria-label="Close menu"
-            className={cn(
-              "inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm",
-              "text-ink transition-[color] duration-(--duration-fast) hover:text-accent",
-            )}
+      {/*
+        The overlay is portalled to <body>. Rendered inline, it would be a
+        descendant of the fixed, backdrop-filtered header (HeaderShell), whose
+        `backdrop-filter` + `position: fixed` establish a containing block for
+        descendant fixed elements — so `fixed inset-0` would resolve against
+        the header's box (only the header height), not the viewport (M-01).
+        Portalling to <body> removes it from that containing block, so
+        `inset-0` covers the full viewport while the header keeps its
+        backdrop-filter treatment untouched.
+      */}
+      {mounted &&
+        createPortal(
+          <div
+            ref={overlayRef}
+            id={overlayId}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            data-open={open}
+            // Hidden from AT + tab order when closed via `inert`-like hiding:
+            // the visibility:hidden in the closed-state CSS removes it from the
+            // tab order, and pointer-events:none prevents interaction; keeping
+            // it in the DOM lets the CSS transition run on open/close.
+            className="mobile-overlay fixed inset-0 z-[60] bg-canvas"
           >
-            <X aria-hidden="true" size={24} strokeWidth={1.75} />
-          </button>
-        </div>
+            <div className="flex items-center justify-between px-(--grid-margin) py-4">
+              <Label as="span" className="font-display text-ink">
+                MENU
+              </Label>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                onClick={close}
+                aria-label="Close menu"
+                className={cn(
+                  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm",
+                  "text-ink transition-[color] duration-(--duration-fast) hover:text-accent",
+                )}
+              >
+                <X aria-hidden="true" size={24} strokeWidth={1.75} />
+              </button>
+            </div>
 
-        <nav aria-label="Mobile" className="px-(--grid-margin) pt-8">
-          <ul className="flex flex-col gap-2">
-            {NAV_ITEMS.filter((item) => !item.brand).map((item, index) => (
-              <li key={`${item.label}-${index}`}>
-                <Link
-                  href={item.href}
-                  onClick={close}
-                  className={cn(
-                    "inline-flex min-h-11 items-center rounded-sm py-2",
-                    "font-display text-4xl text-ink",
-                    "transition-[color] duration-(--duration-fast) hover:text-accent",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
+            <nav aria-label="Mobile" className="px-(--grid-margin) pt-8">
+              <ul className="flex flex-col gap-2">
+                {NAV_ITEMS.filter((item) => !item.brand).map((item, index) => (
+                  <li key={`${item.label}-${index}`}>
+                    <Link
+                      ref={index === 0 ? firstItemRef : undefined}
+                      href={item.href}
+                      onClick={close}
+                      // Heading M (32px) from the approved type scale — applied
+                      // as the token value, not an arbitrary Tailwind step
+                      // (M-06). The element stays a nav <a>, so no heading
+                      // semantics are introduced.
+                      style={{ fontSize: typeScale.headingM }}
+                      className={cn(
+                        "inline-flex min-h-11 items-center rounded-sm py-2",
+                        "font-display text-ink leading-heading tracking-heading",
+                        "transition-[color] duration-(--duration-fast) hover:text-accent",
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
