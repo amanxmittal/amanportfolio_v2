@@ -190,10 +190,10 @@ redundant — resolved under OD-1. No CTA points to a non-existent route.
 | Aspect | Value |
 |---|---|
 | Trigger | On mount (first paint), once |
-| Property | `opacity` 0→1, `transform: translateY(8px)→0` (GPU-friendly) |
+| Property | `transform: translateY(8px)→0` only (GPU-friendly). Opacity is intentionally not animated — transform-only is the approved resolution (`requirements.md` → Recorded resolutions) |
 | Duration | `--duration-standard` (400ms); supporting line may stagger by `--duration-fast` (200ms) |
 | Easing | `ease-standard` (ease-out) |
-| Reduced motion | `useReducedMotion()` → render final state immediately, no transform/opacity animation |
+| Reduced motion | `useReducedMotion()` → render final state immediately, no transform animation; the rendered element does not change with the preference |
 
 Static-first: the headline HTML is fully present and styled server-side; the
 `HeroReveal` client wrapper only animates presence. If it fails to hydrate, the
@@ -335,7 +335,7 @@ per `requirements.md` R4.5.
 | Aspect | Value |
 |---|---|
 | Trigger | Scroll-into-view, once (Motion `whileInView`, `viewport={{ once: true }}`) |
-| Property | `opacity` 0→1, small `translateY` on each progressive line / principle, **staggered** (never all at once — blueprint §24.2) |
+| Property | `translateY(8px)→0` only on each progressive line / principle, **staggered** (never all at once — blueprint §24.2). Opacity is intentionally not animated (transform-only resolution) |
 | Duration | `--duration-standard` per item; stagger step `--duration-fast` |
 | Easing | `ease-standard` |
 | Reduced motion | `useReducedMotion()` → all lines visible immediately, no stagger |
@@ -343,7 +343,7 @@ per `requirements.md` R4.5.
 The approved copy is fully present server-side; the reveal only affects
 presence (static-first). This is where `components/motion/Reveal.tsx` earns its
 place as a reusable client primitive (a thin wrapper that applies the
-whileInView opacity/translate with reduced-motion branching), reused by other
+whileInView translate with reduced-motion branching), reused by other
 sections rather than re-implemented per section.
 
 ## 9. Scale / Experience & Impact (§7)
@@ -444,8 +444,9 @@ anchor target (`#contact`).
 ## 14. Motion architecture (cross-section)
 
 - **`components/motion/Reveal.tsx`** — `"use client"`. Thin reusable wrapper:
-  `whileInView` opacity/translateY, `viewport={{ once: true }}`,
-  `useReducedMotion()` → render children statically. Used by Philosophy,
+  `whileInView` translateY only (opacity intentionally not animated),
+  `viewport={{ once: true }}`, `useReducedMotion()` → final state without
+  animation, same rendered element in both modes. Used by Philosophy,
   Principles, Scale, About, Contact for restrained entrance reveals. One island
   pattern, reused — not re-implemented per section.
 - **`components/hero/HeroReveal.tsx`** — `"use client"`. Hero entrance (§5).

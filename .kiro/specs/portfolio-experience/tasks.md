@@ -54,10 +54,11 @@ provisional.
 
 - [ ] 2. Build the reusable motion primitive `Reveal`
   - Create `components/motion/Reveal.tsx` (`"use client"`) per `design.md`
-    §14: a thin wrapper using `motion` `whileInView` (opacity 0→1 + small
-    `translateY`), `viewport={{ once: true }}`, with `useReducedMotion()`
-    branching to render children statically (no animation) when reduced motion
-    is set. Props: `children`, optional `delay`/`index` for stagger. Duration
+    §14: a thin wrapper using `motion` `whileInView` (`translateY(8px)→0`
+    only — opacity intentionally not animated, per the transform-only
+    resolution in `requirements.md`), `viewport={{ once: true }}`, with
+    `useReducedMotion()` resolving to the final state without animation when
+    reduced motion is set (same rendered element in both modes). Props: `children`, optional `delay`/`index` for stagger. Duration
     values equal the token values (0.4 = `--duration-standard`, 0.2 =
     `--duration-fast`) with a comment tying each to its token (Requirement
     8.2/8.4; `design.md` §14 motion-token discipline).
@@ -111,7 +112,7 @@ provisional.
     (`min-h-dvh`/`svh` is a layout utility, allowed — not a token);
     grid-aligned; mobile reflow with headline dominant and no overflow.
   - Add the entrance via `components/hero/HeroReveal.tsx` (`"use client"`,
-    §5 motion table: opacity/translateY, `--duration-standard`, `ease-standard`,
+    §5 motion table: translateY only (no opacity), `--duration-standard`, `ease-standard`,
     `useReducedMotion()` → final state). Static-first: headline present/styled
     server-side; wrapper animates presence only.
   - CTA per OD-1/§5: a restrained anchor to `#selected-work` (and/or `#contact`)

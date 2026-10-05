@@ -1,7 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { LazyMotion, domAnimation, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
+import { cn } from "@/lib/utils/cn";
 
 /**
  * Reveal — the single reusable entrance primitive (design.md §14; Task 2).
@@ -13,8 +15,9 @@ import { motion, useReducedMotion } from "motion/react";
  * ---------------------------------------------------------------------------
  * Why this animates transform only, and not opacity
  * ---------------------------------------------------------------------------
- * design.md §14's motion table specifies `opacity 0 -> 1` plus a small
- * translateY. That cannot be combined with the same spec's static-first rule
+ * design.md's motion tables originally specified `opacity 0 -> 1` plus a small
+ * translateY (now amended — see requirements.md → Recorded resolutions). That
+ * cannot be combined with the same spec's static-first rule
  * (Requirement 8.5; design.md §5: "if it fails to hydrate, the content is
  * already visible"), because Motion serialises `initial` into the server HTML.
  * Measured on this build: with `initial={{ opacity: 0 }}`, 21 elements shipped
@@ -46,10 +49,39 @@ import { motion, useReducedMotion } from "motion/react";
  * gates, hydration-dependent visibility, or JS visibility gates) — all were
  * evaluated and rejected. This decision is closed.
  *
- * Reduced motion (Requirement 8.4) is branched in JS because the global CSS
- * reduced-motion block cannot stop JS-driven motion.
+ * ---------------------------------------------------------------------------
+ * Reduced motion (Requirement 8.4) — same element in both modes
+ * ---------------------------------------------------------------------------
+ * The rendered element never changes with the motion preference. The server
+ * cannot know the preference, so it always serialises `initial`
+ * (`transform: translateY(8px)`). An earlier version returned a plain <div>
+ * when reduced motion was set; React does not patch attribute mismatches
+ * during hydration, so that left every wrapper stuck 8px down for
+ * reduced-motion users (audit F-02).
+ *
+ * Two layers now resolve it, neither touching visibility:
+ *   1. `motion-reduce:transform-none!` — a CSS reset that beats Motion's
+ *      inline transform for reduced-motion users before hydration, without
+ *      JavaScript, and for wrappers that never enter the viewport.
+ *   2. `useReducedMotion()` → zero-duration transition, so Motion itself
+ *      settles any reveal instantly instead of running the animation. The
+ *      global CSS reduced-motion block cannot stop JS-driven motion, hence
+ *      the JS branch. Only the transition config changes, not the markup.
  *
  * `transform` is compositor-only, so revealing causes no layout shift.
+ *
+ * ---------------------------------------------------------------------------
+ * LazyMotion
+ * ---------------------------------------------------------------------------
+ * `m` + `LazyMotion features={domAnimation}` is Motion's officially supported
+ * reduced-bundle configuration. `domAnimation` includes the `inView` gesture
+ * behind `whileInView` and the animation feature; nothing else is needed.
+ * `strict` makes accidental use of the full `motion.*` component an error.
+ * `m` is imported from `motion/react-m` (Motion's documented entry for this
+ * pattern): taking it from `motion/react` keeps the full `motion` component
+ * in the bundle. Measured on `/` (gzip -9, vs. the Foundation-only /about):
+ * full `motion.div` +44,895 B → `m` via motion/react +40,847 B →
+ * `m` via motion/react-m +31,231 B.
  */
 
 /**
@@ -66,6 +98,15 @@ const STAGGER_STEP = 0.2;
 const TRAVEL_PX = 8;
 const MAX_STAGGER_STEPS = 4;
 
+/**
+ * Shared with HeroReveal so both wrappers resolve reduced motion identically.
+ * `transform-none` with the important modifier is needed because Motion
+ * writes the transform as an inline style.
+ */
+export const REDUCED_MOTION_RESET = "motion-reduce:transform-none!";
+/** Settle instantly: Motion reaches the final state without animating. */
+export const REDUCED_MOTION_TRANSITION = { duration: 0 } as const;
+
 type RevealProps = {
   children: ReactNode;
   /**
@@ -81,24 +122,26 @@ type RevealProps = {
 export function Reveal({ children, index = 0, className }: RevealProps) {
   const prefersReducedMotion = useReducedMotion();
 
-  if (prefersReducedMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
   return (
-    <motion.div
-      className={className}
-      initial={{ y: TRAVEL_PX }}
-      whileInView={{ y: 0 }}
-      // Fires once; never re-triggers disruptively on scroll-up (Req 8.6).
-      viewport={{ once: true }}
-      transition={{
-        duration: DURATION_STANDARD,
-        delay: Math.min(index, MAX_STAGGER_STEPS) * STAGGER_STEP,
-        ease: "easeOut",
-      }}
-    >
-      {children}
-    </motion.div>
+    <LazyMotion features={domAnimation} strict>
+      <m.div
+        className={cn(REDUCED_MOTION_RESET, className)}
+        initial={{ y: TRAVEL_PX }}
+        whileInView={{ y: 0 }}
+        // Fires once; never re-triggers disruptively on scroll-up (Req 8.6).
+        viewport={{ once: true }}
+        transition={
+          prefersReducedMotion
+            ? REDUCED_MOTION_TRANSITION
+            : {
+                duration: DURATION_STANDARD,
+                delay: Math.min(index, MAX_STAGGER_STEPS) * STAGGER_STEP,
+                ease: "easeOut",
+              }
+        }
+      >
+        {children}
+      </m.div>
+    </LazyMotion>
   );
 }

@@ -87,14 +87,16 @@ function CaseStudyAffordance({
       <Link
         href={`/work/${project.caseStudySlug}`}
         aria-labelledby={labelledBy}
-        className="group/link mt-8 inline-flex min-h-11 items-center gap-3 rounded-sm text-ink underline decoration-border underline-offset-8 transition-[color] duration-(--duration-fast) hover:text-accent hover:decoration-accent"
+        // Hover affordance mirrored on :focus-visible (Requirement 3.6); the
+        // global 2px focus ring still applies on top.
+        className="group/link mt-8 inline-flex min-h-11 items-center gap-3 rounded-sm text-ink underline decoration-border underline-offset-8 transition-[color] duration-(--duration-fast) hover:text-accent hover:decoration-accent focus-visible:text-accent focus-visible:decoration-accent"
       >
         <Label as="span" className="uppercase">
           Read case study
         </Label>
         <span
           aria-hidden="true"
-          className="transition-transform duration-(--duration-fast) ease-standard group-hover/link:translate-x-1"
+          className="transition-transform duration-(--duration-fast) ease-standard group-hover/link:translate-x-1 group-focus-visible/link:translate-x-1"
         >
           →
         </span>

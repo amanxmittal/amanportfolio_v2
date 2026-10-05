@@ -1,16 +1,24 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { LazyMotion, domAnimation, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
+import {
+  REDUCED_MOTION_RESET,
+  REDUCED_MOTION_TRANSITION,
+} from "@/components/motion/Reveal";
+import { cn } from "@/lib/utils/cn";
 
 /**
  * HeroReveal — Hero entrance wrapper (design.md §5 motion table).
  *
  * Differs from `Reveal` in one respect only: the Hero is above the fold at
  * load, so its trigger is MOUNT, not scroll-into-view. The static-first
- * reasoning, the transform-only animated property, the reduced-motion branch
- * and the token-equal timings are identical — see components/motion/Reveal.tsx
- * for the full rationale and the measurements behind it.
+ * reasoning, the transform-only animated property, the reduced-motion
+ * handling (same element in both modes; CSS reset + zero-duration
+ * transition), the LazyMotion configuration and the token-equal timings are
+ * identical — see components/motion/Reveal.tsx for the full rationale and the
+ * measurements behind it.
  *
  * Static-first matters most here: the Hero carries the page's only <h1> and
  * the approved headline. It is server-rendered and fully legible before any
@@ -39,22 +47,24 @@ type HeroRevealProps = {
 export function HeroReveal({ children, index = 0, className }: HeroRevealProps) {
   const prefersReducedMotion = useReducedMotion();
 
-  if (prefersReducedMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
   return (
-    <motion.div
-      className={className}
-      initial={{ y: TRAVEL_PX }}
-      animate={{ y: 0 }}
-      transition={{
-        duration: DURATION_STANDARD,
-        delay: index * STAGGER_STEP,
-        ease: "easeOut",
-      }}
-    >
-      {children}
-    </motion.div>
+    <LazyMotion features={domAnimation} strict>
+      <m.div
+        className={cn(REDUCED_MOTION_RESET, className)}
+        initial={{ y: TRAVEL_PX }}
+        animate={{ y: 0 }}
+        transition={
+          prefersReducedMotion
+            ? REDUCED_MOTION_TRANSITION
+            : {
+                duration: DURATION_STANDARD,
+                delay: index * STAGGER_STEP,
+                ease: "easeOut",
+              }
+        }
+      >
+        {children}
+      </m.div>
+    </LazyMotion>
   );
 }

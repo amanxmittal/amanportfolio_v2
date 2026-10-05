@@ -622,6 +622,35 @@ not resolved.
   (CR-5). Default assumption absent a decision: typography-led Hero, no raster
   media.
 
+### Recorded resolutions (approved by Aman)
+
+This records decisions already approved for this milestone; it adds no new
+requirement. Where an earlier passage of this spec reads otherwise, the
+resolution below governs.
+
+- **OD-1 — deferred.** No signature transition in this milestone. Requirement 2
+  does not apply; Hero → Selected Work is an ordinary section boundary and the
+  slot is held empty in its approved position.
+- **OD-2 — included.** The Design System section ships in this milestone
+  (Requirement 6 applies). As implemented, it is shallow/editorial: a
+  server-rendered section with no client islands.
+- **OD-3 — deferred.** No homepage Playground section; Requirement 7 does not
+  apply; the slot is held empty in its approved position.
+- **OD-4 — gated.** The Scale section renders a visibly gated "pending
+  verification" state until CR-3 verified figures are supplied. The
+  blueprint §13 illustrative figures are not rendered.
+- **OD-5 — not observed; remains deferred.** The deferred SC 2.4.11 mechanism
+  is not adopted (Requirement 9.9).
+- **OD-6 — typography-only Hero.** No Hero media; CR-5 does not apply.
+- **Motion — transform-only reveals.** `Reveal` and `HeroReveal` animate
+  `transform: translateY(8px) → 0` only; **opacity is intentionally not
+  animated** and remains 1 throughout. Animating opacity from 0 serialises
+  hidden content into the server HTML, which violates static-first
+  (Requirement 8.5). Trigger, duration (`--duration-standard`), easing
+  (`--ease-standard`) and stagger (`--duration-fast`) are as specified in
+  `design.md`. Reduced motion resolves to the final composition without
+  changing the rendered element.
+
 ---
 
 ## Content required from Aman
@@ -651,6 +680,10 @@ to replace provisional placeholders with final content.
   entries/content.
 - **CR-8 — Design System section depth (only if OD-2 = include).** Confirmation
   of how interactive/deep the section should be for this milestone.
+- **CR-9 — Design System section body copy.** Blueprint §14 approves the
+  title, the Token → Component → Pattern → Product → Ecosystem chain and the
+  area names, but no body copy. The section's supporting copy remains a
+  visibly provisional placeholder until supplied.
 
 ## About & Contact — approved copy anchors
 
