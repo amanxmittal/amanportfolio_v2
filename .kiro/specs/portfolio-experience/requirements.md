@@ -650,6 +650,24 @@ resolution below governs.
   (`--ease-standard`) and stagger (`--duration-fast`) are as specified in
   `design.md`. Reduced motion resolves to the final composition without
   changing the rendered element.
+- **F-01 — Hero reflow at 320 CSS px: known exception (closed for this
+  milestone).** The approved Display XL typography is retained. No change is
+  made to the global type scale, the breakpoints, or Hero-specific
+  typography, and no workaround is implemented. At 320 CSS px the Hero
+  headline word "EXPERIENCES" does not fit, so the page scrolls horizontally
+  there (WCAG 2.2 SC 1.4.10 Reflow). This is recorded as a known
+  responsive/accessibility exception for this milestone, because resolving it
+  requires a design-system decision rather than an implementation fix. Measured
+  constraint at 320 CSS px:
+  - available content width: 280px
+  - Display XL (approved, 56px floor): 340px word width
+  - Display L: 309px (still overflows)
+  - Display M: 243px (fits)
+
+  Display M would solve the issue but would reduce the approved mobile
+  Display XL target (~56px) substantially. **Future work (design-system
+  decision, not this milestone):** whether to lower the Display XL minimum,
+  introduce a Hero-specific type step, or otherwise resolve 320 CSS px reflow.
 
 ---
 

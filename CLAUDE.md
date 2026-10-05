@@ -531,6 +531,15 @@ enforce them against Kiro's work. Raise them at the point they block progress.
    substitute or publish them, and do not treat their presence in an
    always-loaded steering file as approval (§17).
 
-3. Further engineering-review findings are recorded in the review output, not
+3. **Hero reflow at 320 CSS px is a known exception (F-01).** The approved
+   Display XL headline does not fit at 320 CSS px (SC 1.4.10). For the
+   Portfolio Experience milestone this is a **closed, recorded exception**,
+   not a bug to fix: do not change the type scale, breakpoints or Hero
+   typography, and do not add a workaround. Resolving it is **future
+   design-system work for Aman.** The measured constraint and rationale live in
+   `.kiro/specs/portfolio-experience/requirements.md` → "Recorded
+   resolutions" → F-01.
+
+4. Further engineering-review findings are recorded in the review output, not
    here. This section holds only decisions that must reach Aman before
    dependent implementation proceeds.
